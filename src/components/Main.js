@@ -7,6 +7,7 @@ import FinishScreen from "./FinishScreen";
 import Timer from "./Timer";
 
 const SECS_PER_QUESTION = 30;
+const API_URL = "http://localhost:8000/api";
 
 const initialState = {
   index: 0,
@@ -88,7 +89,7 @@ function reducer(state, action) {
   }
 }
 
-function Main() {
+function Main({ category }) {
   const [
     {
       status,
@@ -105,7 +106,7 @@ function Main() {
   useEffect(() => {
     const fun = async () => {
       try {
-        const res = await fetch("http://localhost:8000/questions");
+        const res = await fetch(`${API_URL}/${category}`);
         const data = await res.json();
         dispatch({
           type: "dataReceived",
@@ -118,7 +119,7 @@ function Main() {
       }
     };
     fun();
-  }, []);
+  }, [category]);
 
   const numQuestions = questions.length;
   return (
@@ -126,7 +127,11 @@ function Main() {
       {status === "error" && <Error />}
       {status === "loading" && <Loader />}
       {status === "ready" && (
-        <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
+        <StartScreen
+          numQuestions={numQuestions}
+          dispatch={dispatch}
+          category={category}
+        />
       )}
       {status === "active" && (
         <>
